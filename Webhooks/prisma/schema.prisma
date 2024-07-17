@@ -21,10 +21,11 @@ model User {
 }
 
 model Workflow {
-  id        Int      @id @default(autoincrement())
-  triggerId Int
-  trigger   Trigger?
-  actions   Action[]
+  id          Int           @id @default(autoincrement())
+  triggerId   Int
+  trigger     Trigger?
+  actions     Action[]
+  workflowRun WorkflowRun[]
 }
 
 model Trigger {
@@ -32,7 +33,7 @@ model Trigger {
   typeId     Int
   workflowId Int               @unique
   type       AvailableTriggers @relation(fields: [typeId], references: [id])
-  Workflow   Workflow          @relation(fields: [workflowId], references: [id])
+  workflow   Workflow          @relation(fields: [workflowId], references: [id])
 }
 
 model AvailableTriggers {
@@ -52,5 +53,19 @@ model Action {
 model AvailableAction {
   id     Int      @id @default(autoincrement())
   name   String
-  Action Action[]
+  action Action[]
+}
+
+model WorkflowRun {
+  id                Int                @id @default(autoincrement())
+  workflowId        Int
+  workflow          Workflow?          @relation(fields: [workflowId], references: [id])
+  workflowRunOutbox WorkflowRunOutbox?
+  metadata          Json
+}
+
+model WorkflowRunOutbox {
+  id            Int         @id @default(autoincrement())
+  workflowRun   WorkflowRun @relation(fields: [workflowRunId], references: [id])
+  workflowRunId Int         @unique
 }
