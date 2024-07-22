@@ -17,21 +17,21 @@ const client_1 = require("@prisma/client");
 const client = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.post('/hooks/catch/:userId/:zapId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/hooks/catch/:userId/:workflowId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
-    const workflowId = req.params.zapId;
+    const workflowId = req.params.workflowId;
     const body = req.body;
     console.log('control reached here');
     console.log(workflowId);
     console.log(body);
     yield client.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const run = yield client.workflowRun.create({
+        const run = yield tx.workflowRun.create({
             data: {
                 workflowId: parseInt(workflowId),
                 metadata: body
             }
         });
-        yield client.workflowRunOutbox.create({
+        yield tx.workflowRunOutbox.create({
             data: {
                 workflowRunId: run.id
             }

@@ -4,11 +4,11 @@ import {PrismaClient} from '@prisma/client';
 const client=new PrismaClient();
 const app = express();
 app.use(express.json());
-//https://domain.com/hooks/catch/{userId}/{zapId}
+//https://domain.com/hooks/catch/{userId}/{workflowId}
 //add some auth middleware
-app.post('/hooks/catch/:userId/:zapId', async (req, res) => {
+app.post('/hooks/catch/:userId/:workflowId', async (req, res) => {
   const userId = req.params.userId;
-  const workflowId = req.params.zapId;
+  const workflowId = req.params.workflowId;
   const body=req.body;
 
   //we only need to create a trigger event here
@@ -20,14 +20,14 @@ app.post('/hooks/catch/:userId/:zapId', async (req, res) => {
   console.log(body);
   await client.$transaction(async tx=>{
 
-    const run=await client.workflowRun.create({
+    const run=await tx.workflowRun.create({
       data:{
         workflowId:parseInt(workflowId),
         metadata:body
       }
     });
 
-    await client.workflowRunOutbox.create({
+    await tx.workflowRunOutbox.create({
       data:{
         workflowRunId:run.id
       }
