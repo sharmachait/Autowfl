@@ -24,14 +24,25 @@ function worker() {
             fromBeginning: true,
         });
         yield consumer.run({
+            autoCommit: false,
             eachMessage: (_a) => __awaiter(this, [_a], void 0, function* ({ topic, partition, message }) {
                 var _b;
+                yield new Promise((resolve) => {
+                    setTimeout(resolve, 5000);
+                });
                 console.log({
                     partition,
                     val: (_b = message.value) === null || _b === void 0 ? void 0 : _b.toString(),
                     offset: message.offset,
                     topic,
                 });
+                yield consumer.commitOffsets([
+                    {
+                        topic,
+                        partition,
+                        offset: '' + (parseInt(message.offset) + 1),
+                    },
+                ]);
             }),
         });
     });

@@ -15,17 +15,21 @@ async function worker() {
   await consumer.run({
     autoCommit: false,
     eachMessage: async ({ topic, partition, message }) => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 5000);
+      });
       console.log({
         partition,
         val: message.value?.toString(),
         offset: message.offset,
         topic,
       });
+      //the offset we last committed will be picked up again if the process died while executing it
       await consumer.commitOffsets([
         {
           topic,
           partition,
-          offset: message.offset,
+          offset: '' + (parseInt(message.offset) + 1),
         },
       ]);
     },
