@@ -14,26 +14,29 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String
-  password String
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String
+  password  String
+  workflows Workflow[]
 }
 
 model Workflow {
   id          Int           @id @default(autoincrement())
   triggerId   Int
+  userId      Int
   trigger     Trigger?
   actions     Action[]
   workflowRun WorkflowRun[]
+  User        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Trigger {
   id         Int               @id @default(autoincrement())
   typeId     Int
   workflowId Int               @unique
-  type       AvailableTriggers @relation(fields: [typeId], references: [id])
-  workflow   Workflow          @relation(fields: [workflowId], references: [id])
+  type       AvailableTriggers @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  workflow   Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }
 
 model AvailableTriggers {
@@ -46,8 +49,8 @@ model Action {
   id           Int             @id @default(autoincrement())
   workflowId   Int
   typeId       Int
-  workflow     Workflow        @relation(fields: [workflowId], references: [id])
-  type         AvailableAction @relation(fields: [typeId], references: [id])
+  workflow     Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  type         AvailableAction @relation(fields: [typeId], references: [id], onDelete: Cascade)
   sortingOrder Int             @default(0)
 }
 
@@ -60,13 +63,13 @@ model AvailableAction {
 model WorkflowRun {
   id                Int                @id @default(autoincrement())
   workflowId        Int
-  workflow          Workflow?          @relation(fields: [workflowId], references: [id])
+  workflow          Workflow?          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   workflowRunOutbox WorkflowRunOutbox?
   metadata          Json
 }
 
 model WorkflowRunOutbox {
   id            Int         @id @default(autoincrement())
-  workflowRun   WorkflowRun @relation(fields: [workflowRunId], references: [id])
+  workflowRun   WorkflowRun @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
   workflowRunId Int         @unique
 }
