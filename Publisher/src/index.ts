@@ -1,33 +1,37 @@
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Kafka } from 'kafkajs';
-const TOPIC="workflow-events";
+const TOPIC = 'workflow-events';
 const kafka = new Kafka({
-    clientId: 'outbox-processor',
-    brokers: ['localhost:9092'],
+  clientId: 'outbox-processor',
+  brokers: ['localhost:9092'],
 });
-const client=new PrismaClient();
-async function publisher(){
-    const producer=kafka.producer();
-    await producer.connect();
-    while(1){
-        const pendingRows=await client.workflowRunOutbox.findMany({
-            where:{},
-            take:10
-        })
+const client = new PrismaClient();
+async function publisher() {
+  const producer = kafka.producer();
+  await producer.connect();
+  while (1) {
+    await client.$transaction(async (tx) => {
+      const pendingRows = await tx.workflowRunOutbox.findMany({
+        where: {},
+        take: 10,
+      });
 
-        await producer.send({
-            topic:TOPIC,
-            messages:pendingRows.map(r=>({value:r.workflowRunId.toString()}))
-        });
+      await producer.send({
+        topic: TOPIC,
+        messages: pendingRows.map((r) => ({
+          value: r.workflowRunId.toString(),
+        })),
+      });
 
-        await client.workflowRunOutbox.deleteMany({
-            where:{
-                id:{
-                    in:pendingRows.map(x=>x.id)
-                }
-            }
-        });
-    }
+      await tx.workflowRunOutbox.deleteMany({
+        where: {
+          id: {
+            in: pendingRows.map((x) => x.id),
+          },
+        },
+      });
+    });
+  }
 }
 
 publisher();

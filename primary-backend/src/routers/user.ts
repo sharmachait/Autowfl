@@ -71,15 +71,7 @@ router.post('/signin', async (req, res) => {
     .json({ id: user.id, username });
 });
 
-declare global {
-  namespace Express {
-    interface Request {
-      id: number;
-    }
-  }
-}
-
-router.get('/user', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   const id = req.id;
   //todo fix the type
   const user = await prismaClient.user.findFirst({
