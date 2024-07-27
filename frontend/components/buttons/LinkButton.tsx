@@ -9,7 +9,7 @@ export const LinkButton = ({ children, onClick }: LinkButtonParams) => {
   return (
     <button
       className={
-        'px-2 py-1 cursor-pointer hover:bg-slate-200 rounded-3xl font-extralight '
+        'px-2 py-1 cursor-pointer hover:bg-slate-200 rounded-3xl font-light '
       }
       onClick={onClick}
     >
