@@ -66,7 +66,7 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
     res
         .cookie('token', token, { sameSite: 'none', secure: true })
         .status(201)
-        .json({ id: user.id, username });
+        .json({ id: user.id, username, token });
 }));
 router.get('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.id;

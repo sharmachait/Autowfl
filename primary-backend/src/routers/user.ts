@@ -68,7 +68,7 @@ router.post('/signin', async (req, res) => {
   res
     .cookie('token', token, { sameSite: 'none', secure: true })
     .status(201)
-    .json({ id: user.id, username });
+    .json({ id: user.id, username, token });
 });
 
 router.get('/', authMiddleware, async (req, res) => {

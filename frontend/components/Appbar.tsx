@@ -6,7 +6,9 @@ import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 export const Appbar = () => {
   const router = useRouter();
   return (
-    <div className={'flex border-b justify-between items-center p-2 mx-8'}>
+    <div
+      className={'flex border-b justify-between items-center p-2 mb-10 mx-8 '}
+    >
       <div className={'text-xl font-extrabold'}>Zapier</div>
       <div className={'flex gap-1 items-center text-xs'}>
         <LinkButton onClick={() => {}}>Contact Sales</LinkButton>

@@ -15,8 +15,10 @@ export default function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  let token = req.cookies?.token;
-  console.log({ ...req.cookies });
+  // let token = req.cookies?.token;
+  // console.log({ ...req.cookies });
+  let token = req.headers.authorization;
+  console.log({ token });
   if (!token) {
     return res.status(403).json({ msg: 'unauthorized' });
   }

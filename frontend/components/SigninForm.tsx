@@ -2,25 +2,16 @@
 import { Input } from '@/components/Input';
 import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 import { useState } from 'react';
-import axios from 'axios';
 import { BACKEND_URL } from '@/app/config';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
-export const SignupForm = () => {
-  const [name, setName] = useState('');
+export const SigninForm = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const router = useRouter();
   return (
     <div className={'flex flex-col gap-4 w-full p-4 border'}>
-      <Input
-        onChange={(e) => {
-          setName(e.target.value);
-        }}
-        type="text"
-        placeholder={'Your name'}
-        label={'Name'}
-      />
       <Input
         onChange={(e) => {
           setEmail(e.target.value);
@@ -40,15 +31,16 @@ export const SignupForm = () => {
       <PrimaryButton
         size={'lg'}
         onClick={async () => {
-          const res = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
+          const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
             username: email,
             password: password,
-            name: name,
           });
-          router.push('/login');
+          localStorage.setItem('token', res.data.token);
+          console.log({ token: res.data.token });
+          router.push('/dashboard');
         }}
       >
-        Get started free
+        Login
       </PrimaryButton>
     </div>
   );

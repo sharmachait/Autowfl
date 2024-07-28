@@ -2,7 +2,7 @@
 export type inputParamsType = {
   type?: 'text' | 'password' | 'email' | 'url';
   placeholder: string;
-  onChange: (e: any) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   label: string;
 };
 export const Input = ({

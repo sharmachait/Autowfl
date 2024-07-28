@@ -1,13 +1,12 @@
 import { CheckLabel } from '@/components/CheckLabel';
 import { Appbar } from '@/components/Appbar';
-import { Input } from '@/components/Input';
 import { SignupForm } from '@/components/SignupForm';
 
 function Signup() {
   return (
     <div>
       <Appbar></Appbar>
-      <div className={'flex justify-center items-center pt-16 gap-12'}>
+      <div className={'flex justify-center items-top pt-6 gap-12'}>
         <div className={''}>
           <div className={'flex flex-col'}>
             <div className={'font-semibold text-3xl max-w-96 pb-8'}>

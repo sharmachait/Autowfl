@@ -76,7 +76,7 @@ router.get('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, vo
 router.get('/:workflowId', middleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.id;
     const workflowId = req.params.workflowId;
-    const workflows = yield db_1.default.workflow.findFirst({
+    const workflow = yield db_1.default.workflow.findFirst({
         where: { id: workflowId, userId: id },
         include: {
             actions: {
@@ -91,7 +91,7 @@ router.get('/:workflowId', middleware_1.default, (req, res) => __awaiter(void 0,
             },
         },
     });
-    return res.json({ workflows });
+    return res.json({ workflow });
 }));
 router.get('/:workflowId', middleware_1.default, (req, res) => {
     console.log(req.params.workflowId);
