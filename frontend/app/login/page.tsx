@@ -6,7 +6,7 @@ function Signin() {
   return (
     <div>
       <Appbar></Appbar>
-      <div className={'flex justify-center items-center gap-12 pt-6'}>
+      <div className={'flex justify-center items-center mt-10 gap-12 pt-6'}>
         <div className={''}>
           <div className={'flex flex-col'}>
             <div className={'font-semibold text-3xl max-w-96 pb-8'}>

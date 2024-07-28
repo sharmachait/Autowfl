@@ -6,7 +6,7 @@ function Signup() {
   return (
     <div>
       <Appbar></Appbar>
-      <div className={'flex justify-center items-top pt-6 gap-12'}>
+      <div className={'flex justify-center items-top mt-10 pt-6 gap-12'}>
         <div className={''}>
           <div className={'flex flex-col'}>
             <div className={'font-semibold text-3xl max-w-96 pb-8'}>

@@ -5,23 +5,33 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '@/app/config';
 import { ZapTable } from '@/components/ZapTable';
+import { useRouter } from 'next/navigation';
 
 export default function () {
   const { loading, zaps } = useZaps();
-
+  const router = useRouter();
   return (
     <div>
       <Appbar></Appbar>
-      <div
-        className={'flex justify-between items-center max-w-screen-lg mx-auto'}
-      >
-        <div>
+      <div className="w-full mt-10 max-w-6xl px-8 mx-auto">
+        <div className={'flex gap-10 justify-between items-center pb-5'}>
           <div className={'text-2xl font-semibold'}>My Zaps</div>
-          {loading ? 'Loading...' : <ZapTable zaps={zaps}></ZapTable>}
+          <DarkButton
+            size={'lg'}
+            onClick={() => {
+              router.push('/zap/create');
+            }}
+          >
+            Create
+          </DarkButton>
         </div>
-        <DarkButton size={'lg'} onClick={() => {}}>
-          Create
-        </DarkButton>
+        {loading ? (
+          'Loading...'
+        ) : (
+          <div className={'pt-5'}>
+            <ZapTable zaps={zaps}></ZapTable>
+          </div>
+        )}
       </div>
     </div>
   );
