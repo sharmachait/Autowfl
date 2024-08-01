@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { BACKEND_URL } from '@/app/config';
 import axios from 'axios';
+import { EmailSelector } from '@/components/EmailSelector';
+import { SolanaSelector } from '@/components/SolanaSelector';
 
 type ModalParams = {
   id: number;
@@ -8,8 +10,17 @@ type ModalParams = {
   availableItems: availableActionType[] | availableTriggerType[];
 };
 export function Modal({ id, onSelect, availableItems }: ModalParams) {
+  const [step, setStep] = useState(0);
+
+  const [selectedAction, setSelectedAction] = useState<null | {
+    name: string;
+    id: string;
+  }>(null);
+
+  const isTrigger = id === 1;
+
   return (
-    <div className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-screen md:inset-0 h-[calc(100%-1rem)] max-h-full bg-orange-200 bg-opacity-70 flex">
+    <div className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-screen md:inset-0 max-h-full bg-orange-200 bg-opacity-70 flex">
       <div className="relative p-4 w-full max-w-lg max-h-full">
         <div className="relative bg-white rounded-lg shadow ">
           <div className="flex items-center justify-between p-2 md:p-2 border-b rounded-t ">
@@ -33,9 +44,9 @@ export function Modal({ id, onSelect, availableItems }: ModalParams) {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                 />
               </svg>
@@ -43,22 +54,45 @@ export function Modal({ id, onSelect, availableItems }: ModalParams) {
             </button>
           </div>
           <div className={'p-2 md:p-2 space-y-4 text-md'}>
-            {availableItems.map(({ id, name, image }) => {
-              return (
-                <div
-                  onClick={() => {
-                    console.log({ id: id, name: name });
-                    onSelect({ id: id, name: name, image: image });
-                  }}
-                  className={
-                    'flex gap-2 border justify-center items-center cursor-pointer hover:bg-orange-100'
-                  }
-                >
-                  <img src={image} width={30} className={'rounded-full'} />
-                  <div>{name}</div>
-                </div>
-              );
-            })}
+            {step === 1 && selectedAction?.id === 'email' && (
+              <EmailSelector></EmailSelector>
+            )}
+            {step === 1 && selectedAction?.id === 'send-sol' && (
+              <SolanaSelector></SolanaSelector>
+            )}
+            {step === 0 && (
+              <div className={'flex flex-col gap-1'}>
+                {availableItems.map(({ id, name, image }) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        if (isTrigger) {
+                          onSelect({ id: id, name: name, image: image });
+                        } else {
+                          console.log({
+                            id: id,
+                            name: name,
+                          });
+                          setSelectedAction({
+                            id: id,
+                            name: name,
+                          });
+                          console.log(step);
+                          setStep((x) => x + 1);
+                          console.log(step);
+                        }
+                      }}
+                      className={
+                        'flex gap-2 border justify-center items-center cursor-pointer hover:bg-orange-100'
+                      }
+                    >
+                      <img src={image} width={30} className={'rounded-full'} />
+                      <div>{name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

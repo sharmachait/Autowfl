@@ -191,6 +191,7 @@ export default function () {
                 return newActions;
               });
             }
+
             setSelectedModalIndex(null);
           }}
         ></Modal>
