@@ -11,6 +11,7 @@ router.post('/', authMiddleware, async (req, res) => {
   if (!parsedData.success) {
     return res.status(411).json({ message: 'Incorrect inputs.' });
   }
+  console.log(parsedData.data);
   const workflowId = await prismaClient.$transaction(async (tx) => {
     const workflow = await tx.workflow.create({
       data: {

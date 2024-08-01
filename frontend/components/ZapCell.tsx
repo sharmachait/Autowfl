@@ -1,7 +1,16 @@
-export const ZapCell = ({ name, index }: { name?: string; index: number }) => {
+export const ZapCell = ({
+  name,
+  index,
+  image,
+}: {
+  name?: string;
+  index: number;
+  image: string;
+}) => {
   return (
-    <div className="bg-amber-50 border border-black p-8 flex justify-center gap-1 w-[400px] cursor-pointer ">
-      <div className="font-semibold">{index}. </div>
+    <div className="bg-amber-50 border border-black p-8 flex justify-center gap-2 w-[400px] cursor-pointer ">
+      <img src={image} width={30} className={'rounded-full'} />
+      <div className="font-semibold">{index}.</div>
       <div>{name}</div>
     </div>
   );

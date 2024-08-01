@@ -36,6 +36,8 @@ export const SigninForm = () => {
             password: password,
           });
           localStorage.setItem('token', res.data.token);
+          localStorage.setItem('id', res.data.id);
+          localStorage.setItem('username', res.data.username);
           console.log({ token: res.data.token });
           router.push('/dashboard');
         }}

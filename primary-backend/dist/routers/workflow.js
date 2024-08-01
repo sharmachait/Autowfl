@@ -23,6 +23,7 @@ router.post('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, v
     if (!parsedData.success) {
         return res.status(411).json({ message: 'Incorrect inputs.' });
     }
+    console.log(parsedData.data);
     const workflowId = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const workflow = yield tx.workflow.create({
             data: {

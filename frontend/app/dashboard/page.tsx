@@ -76,6 +76,7 @@ function useZaps() {
       .get(`${BACKEND_URL}/api/v1/workflow`, config)
       .then((res) => {
         setZaps(res.data.workflows);
+        console.log(res.data.workflows);
         setLoading(false);
       })
       .catch((e) => console.log(e.message));
