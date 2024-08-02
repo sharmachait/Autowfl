@@ -35,6 +35,7 @@ model Trigger {
   id         String            @id @default(uuid())
   typeId     String
   workflowId String            @unique
+  metadata   Json              @default("{}")
   type       AvailableTriggers @relation(fields: [typeId], references: [id], onDelete: Cascade)
   workflow   Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }
@@ -51,10 +52,10 @@ model Action {
   sortingOrder Int    @default(0)
 
   workflowId String
-  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-
-  typeId String
-  type   AvailableAction @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  workflow   Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  metadata   Json            @default("{}")
+  typeId     String
+  type       AvailableAction @relation(fields: [typeId], references: [id], onDelete: Cascade)
 }
 
 model AvailableAction {

@@ -33,6 +33,7 @@ export default function () {
       availableActionId: string;
       availableActionName: string;
       availableActionImage: string;
+      metadata: any;
       index: number;
     }[]
   >([]);
@@ -68,7 +69,7 @@ export default function () {
               for (let a of selectedActions) {
                 actions.push({
                   availableActionId: a.availableActionId,
-                  actionMetadata: 'nothing as of now',
+                  actionMetadata: a.metadata,
                 });
               }
 
@@ -147,6 +148,7 @@ export default function () {
                       availableActionName: '',
                       availableActionImage: '',
                       index: a.length + 2,
+                      metadata: {},
                     },
                   ]);
                 }}
@@ -165,7 +167,7 @@ export default function () {
           }
           id={selectedModalIndex}
           onSelect={(
-            props: null | { id: string; name: string; image: string }
+            props: null | { id: string; name: string; metadata?: any }
           ) => {
             if (props === null) {
               setSelectedModalIndex(null);
@@ -174,7 +176,9 @@ export default function () {
               setSelectedTrigger({
                 availableTriggerId: props.id,
                 availableTriggerName: props.name,
-                availableTriggerImage: props.image,
+                availableTriggerImage: availableTriggers.filter(
+                  (x) => x.id === props.id
+                )[0].image,
               });
             } else if (props !== null) {
               setSelectedActions((a) => {
@@ -185,16 +189,19 @@ export default function () {
                   index: prevAction.index,
                   availableActionName: props.name,
                   availableActionId: props.id,
-                  availableActionImage: props.image,
+                  availableActionImage: availableActions.filter(
+                    (x) => x.id === props.id
+                  )[0].image,
+                  metadata: props.metadata,
                 };
-
+                console.log(newActions);
                 return newActions;
               });
             }
 
             setSelectedModalIndex(null);
           }}
-        ></Modal>
+        />
       )}
     </div>
   );

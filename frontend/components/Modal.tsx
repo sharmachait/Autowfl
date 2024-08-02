@@ -6,9 +6,12 @@ import { SolanaSelector } from '@/components/SolanaSelector';
 
 type ModalParams = {
   id: number;
-  onSelect: (props: null | { name: string; id: string; image: string }) => void;
+  onSelect: (
+    props: null | { name: string; id: string; metadata?: any }
+  ) => void;
   availableItems: availableActionType[] | availableTriggerType[];
 };
+
 export function Modal({ id, onSelect, availableItems }: ModalParams) {
   const [step, setStep] = useState(0);
 
@@ -55,10 +58,24 @@ export function Modal({ id, onSelect, availableItems }: ModalParams) {
           </div>
           <div className={'p-2 md:p-2 space-y-4 text-md'}>
             {step === 1 && selectedAction?.id === 'email' && (
-              <EmailSelector></EmailSelector>
+              <EmailSelector
+                setMetadata={(metadata) => {
+                  onSelect({
+                    ...selectedAction,
+                    metadata,
+                  });
+                }}
+              ></EmailSelector>
             )}
             {step === 1 && selectedAction?.id === 'send-sol' && (
-              <SolanaSelector></SolanaSelector>
+              <SolanaSelector
+                setMetadata={(metadata) => {
+                  onSelect({
+                    ...selectedAction,
+                    metadata,
+                  });
+                }}
+              ></SolanaSelector>
             )}
             {step === 0 && (
               <div className={'flex flex-col gap-1'}>
@@ -67,19 +84,13 @@ export function Modal({ id, onSelect, availableItems }: ModalParams) {
                     <div
                       onClick={() => {
                         if (isTrigger) {
-                          onSelect({ id: id, name: name, image: image });
+                          onSelect({ id: id, name: name });
                         } else {
-                          console.log({
-                            id: id,
-                            name: name,
-                          });
                           setSelectedAction({
                             id: id,
                             name: name,
                           });
-                          console.log(step);
                           setStep((x) => x + 1);
-                          console.log(step);
                         }
                       }}
                       className={
