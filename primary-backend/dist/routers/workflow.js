@@ -33,6 +33,7 @@ router.post('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, v
                     create: parsedData.data.actions.map((x, index) => ({
                         typeId: x.availableActionId,
                         sortingOrder: index,
+                        metadata: x.actionMetadata,
                     })),
                 },
             },
@@ -41,6 +42,7 @@ router.post('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, v
             data: {
                 typeId: parsedData.data.availableTriggerId,
                 workflowId: workflow.id,
+                metadata: parsedData.data.triggerMetadata,
             },
         });
         yield tx.workflow.update({
@@ -94,7 +96,4 @@ router.get('/:workflowId', middleware_1.default, (req, res) => __awaiter(void 0,
     });
     return res.json({ workflow });
 }));
-router.get('/:workflowId', middleware_1.default, (req, res) => {
-    console.log(req.params.workflowId);
-});
 exports.default = router;

@@ -21,6 +21,7 @@ router.post('/', authMiddleware, async (req, res) => {
           create: parsedData.data.actions.map((x, index) => ({
             typeId: x.availableActionId,
             sortingOrder: index,
+            metadata: x.actionMetadata,
           })),
         },
       },
@@ -30,6 +31,7 @@ router.post('/', authMiddleware, async (req, res) => {
       data: {
         typeId: parsedData.data.availableTriggerId,
         workflowId: workflow.id,
+        metadata: parsedData.data.triggerMetadata,
       },
     });
 
@@ -87,7 +89,7 @@ router.get('/:workflowId', authMiddleware, async (req, res) => {
   return res.json({ workflow });
 });
 
-router.get('/:workflowId', authMiddleware, (req, res) => {
-  console.log(req.params.workflowId);
-});
+// router.get('/:workflowId', authMiddleware, (req, res) => {
+//   console.log(req.params.workflowId);
+// });
 export default router;
