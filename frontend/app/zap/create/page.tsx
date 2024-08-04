@@ -28,6 +28,7 @@ export default function () {
     availableTriggerName: string;
     availableTriggerImage: string;
   }>();
+
   const [selectedActions, setSelectedActions] = useState<
     {
       availableActionId: string;
@@ -37,13 +38,16 @@ export default function () {
       index: number;
     }[]
   >([]);
+
   const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(
     null
   );
 
   const { availableActions, availableTriggers } =
     useAvailableActionsAndTriggers();
+
   const router = useRouter();
+
   return (
     <div>
       <div className={'z-10'}>

@@ -9,12 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
 const kafkajs_1 = require("kafkajs");
+const parser_1 = require("./parser");
 const TOPIC = 'workflow-events';
 const kafka = new kafkajs_1.Kafka({
     clientId: 'outbox-processor',
     brokers: ['localhost:9092'],
 });
+const prismaClient = new client_1.PrismaClient();
 function worker() {
     return __awaiter(this, void 0, void 0, function* () {
         const consumer = kafka.consumer({ groupId: 'worker' });
@@ -26,16 +29,52 @@ function worker() {
         yield consumer.run({
             autoCommit: false,
             eachMessage: (_a) => __awaiter(this, [_a], void 0, function* ({ topic, partition, message }) {
-                var _b;
+                var _b, _c, _d, _e;
                 yield new Promise((resolve) => {
                     setTimeout(resolve, 5000);
                 });
-                console.log({
-                    partition,
-                    val: (_b = message.value) === null || _b === void 0 ? void 0 : _b.toString(),
-                    offset: message.offset,
-                    topic,
+                if (!((_b = message.value) === null || _b === void 0 ? void 0 : _b.toString())) {
+                    return;
+                }
+                const parsedValue = JSON.parse((_c = message === null || message === void 0 ? void 0 : message.value) === null || _c === void 0 ? void 0 : _c.toString());
+                const workflowRunId = parsedValue.workflowRunId;
+                const stage = parseInt(parsedValue.stage);
+                const workflowRunDetails = yield prismaClient.workflowRun.findFirst({
+                    where: {
+                        id: workflowRunId,
+                    },
+                    include: {
+                        workflow: {
+                            include: {
+                                trigger: true,
+                                actions: {
+                                    include: {
+                                        type: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
                 });
+                const actions = (_d = workflowRunDetails === null || workflowRunDetails === void 0 ? void 0 : workflowRunDetails.workflow) === null || _d === void 0 ? void 0 : _d.actions;
+                if (!actions)
+                    return;
+                const currentAction = (_e = workflowRunDetails === null || workflowRunDetails === void 0 ? void 0 : workflowRunDetails.workflow) === null || _e === void 0 ? void 0 : _e.actions.find((x) => x.sortingOrder === stage);
+                if (!currentAction) {
+                    console.log('Action not found');
+                    return;
+                }
+                const workflowMetdata = workflowRunDetails.metadata;
+                if (currentAction.type.id === 'email') {
+                    yield sendMail(currentAction, workflowMetdata);
+                }
+                else if (currentAction.type.id === 'send-sol') {
+                    yield sendSol(currentAction, workflowMetdata);
+                }
+                const lastStage = actions.length - 1;
+                if (stage !== lastStage) {
+                    yield publish({ workflowRunId, stage: stage + 1 });
+                }
                 yield consumer.commitOffsets([
                     {
                         topic,
@@ -44,6 +83,38 @@ function worker() {
                     },
                 ]);
             }),
+        });
+    });
+}
+function sendMail(currentAction, workflowMetdata) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        console.log('SendEmail()');
+        const body = (0, parser_1.parse)((_a = currentAction.metadata) === null || _a === void 0 ? void 0 : _a.body, workflowMetdata);
+        const email = (0, parser_1.parse)((_b = currentAction.metadata) === null || _b === void 0 ? void 0 : _b.email, workflowMetdata);
+        console.log({ email, body });
+    });
+}
+function sendSol(currentAction, workflowMetdata) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        console.log('sendSol()');
+        const amount = (0, parser_1.parse)((_a = currentAction.metadata) === null || _a === void 0 ? void 0 : _a.amount, workflowMetdata);
+        const address = (0, parser_1.parse)((_b = currentAction.metadata) === null || _b === void 0 ? void 0 : _b.address, workflowMetdata);
+        console.log({ amount, address });
+    });
+}
+function publish(message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const producer = kafka.producer();
+        yield producer.connect();
+        yield producer.send({
+            topic: TOPIC,
+            messages: [
+                {
+                    value: JSON.stringify(message),
+                },
+            ],
         });
     });
 }

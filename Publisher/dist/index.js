@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const kafkajs_1 = require("kafkajs");
-const TOPIC = "workflow-events";
+const TOPIC = 'workflow-events';
 const kafka = new kafkajs_1.Kafka({
     clientId: 'outbox-processor',
     brokers: ['localhost:9092'],
@@ -22,21 +22,29 @@ function publisher() {
         const producer = kafka.producer();
         yield producer.connect();
         while (1) {
-            const pendingRows = yield client.workflowRunOutbox.findMany({
-                where: {},
-                take: 10
-            });
-            yield producer.send({
-                topic: TOPIC,
-                messages: pendingRows.map(r => ({ value: r.workflowRunId.toString() }))
-            });
-            yield client.workflowRunOutbox.deleteMany({
-                where: {
-                    id: {
-                        in: pendingRows.map(x => x.id)
-                    }
-                }
-            });
+            yield client.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
+                const pendingRows = yield tx.workflowRunOutbox.findMany({
+                    where: {},
+                    take: 10,
+                });
+                console.log({ pendingRows });
+                yield producer.send({
+                    topic: TOPIC,
+                    messages: pendingRows.map((r) => ({
+                        value: JSON.stringify({
+                            workflowRunId: r.workflowRunId.toString(),
+                            stage: 0,
+                        }),
+                    })),
+                });
+                yield tx.workflowRunOutbox.deleteMany({
+                    where: {
+                        id: {
+                            in: pendingRows.map((x) => x.id),
+                        },
+                    },
+                });
+            }));
         }
     });
 }

@@ -1,6 +1,8 @@
+### kafka
+
 1. get kafka up 
 
-> docker run -p 9092:9092 apache/kafka:3.7.1
+> docker run -p 9092:9092 -d apache/kafka:3.7.1
 
 > docker exec -it containerid /bin/bash
 
@@ -13,3 +15,8 @@
 3. get the publisher up to read from kafka outbox and publish to kafka
 
 4. get worker up to read from kafka, do the work and send acknowledgement to kafka
+
+### seed
+
+> cd primary-backend
+> npx prisma db seed

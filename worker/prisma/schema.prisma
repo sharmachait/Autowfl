@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  workflows Workflow[]
+}
+
+model Workflow {
+  id          String        @id @default(uuid())
+  triggerId   String
+  userId      String
+  trigger     Trigger?
+  actions     Action[]
+  workflowRun WorkflowRun[]
+  User        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Trigger {
+  id         String            @id @default(uuid())
+  typeId     String
+  workflowId String            @unique
+  metadata   Json              @default("{}")
+  type       AvailableTriggers @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  workflow   Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+model AvailableTriggers {
+  id       String    @id @default(uuid())
+  name     String
+  image    String
+  triggers Trigger[]
+}
+
+model Action {
+  id           String @id @default(uuid())
+  sortingOrder Int    @default(0)
+
+  workflowId String
+  workflow   Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  metadata   Json            @default("{}")
+  typeId     String
+  type       AvailableAction @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model AvailableAction {
+  id     String   @id @default(uuid())
+  name   String
+  image  String
+  action Action[]
+}
+
+model WorkflowRun {
+  id                String             @id @default(uuid())
+  workflowId        String
+  workflow          Workflow?          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowRunOutbox WorkflowRunOutbox?
+  metadata          Json
+}
+
+model WorkflowRunOutbox {
+  id            String      @id @default(uuid())
+  workflowRun   WorkflowRun @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+  workflowRunId String      @unique
+}

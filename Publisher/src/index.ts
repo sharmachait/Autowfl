@@ -15,11 +15,14 @@ async function publisher() {
         where: {},
         take: 10,
       });
-
+      console.log({ pendingRows });
       await producer.send({
         topic: TOPIC,
         messages: pendingRows.map((r) => ({
-          value: r.workflowRunId.toString(),
+          value: JSON.stringify({
+            workflowRunId: r.workflowRunId.toString(),
+            stage: 0,
+          }),
         })),
       });
 

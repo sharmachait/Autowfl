@@ -27,16 +27,16 @@ app.post('/hooks/catch/:userId/:workflowId', (req, res) => __awaiter(void 0, voi
     yield client.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const run = yield tx.workflowRun.create({
             data: {
-                workflowId: parseInt(workflowId),
-                metadata: body
-            }
+                workflowId: workflowId,
+                metadata: body,
+            },
         });
         yield tx.workflowRunOutbox.create({
             data: {
-                workflowRunId: run.id
-            }
+                workflowRunId: run.id,
+            },
         });
     }));
-    res.json({ msg: "sent" });
+    res.json({ msg: 'sent' });
 }));
-app.listen(3000);
+app.listen(3002);
