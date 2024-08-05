@@ -5,7 +5,7 @@ function parse(text, values, startDelimiter = '{', endDelimiter = '}') {
     let st = 0;
     let en = 0;
     let res = '';
-    while (en != text.length) {
+    while (en < text.length) {
         if (text[st] === startDelimiter) {
             const start = st + 1;
             let end = st + 1;

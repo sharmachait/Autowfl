@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { Kafka } from 'kafkajs';
 import { JsonObject } from '@prisma/client/runtime/library';
 import { parse } from './parser';
+import { sendEmail } from './services/email';
 const TOPIC = 'workflow-events';
 const kafka = new Kafka({
   clientId: 'outbox-processor',
@@ -64,9 +65,9 @@ async function worker() {
       const workflowMetdata = workflowRunDetails.metadata;
 
       if (currentAction.type.id === 'email') {
-        await sendMail(currentAction, workflowMetdata);
+        await email(currentAction, workflowMetdata);
       } else if (currentAction.type.id === 'send-sol') {
-        await sendSol(currentAction, workflowMetdata);
+        await solana(currentAction, workflowMetdata);
       }
 
       const lastStage = actions.length - 1;
@@ -86,7 +87,7 @@ async function worker() {
   });
 }
 
-async function sendMail(currentAction: any, workflowMetdata: any) {
+async function email(currentAction: any, workflowMetdata: any) {
   console.log('SendEmail()');
   const body = parse(
     (currentAction.metadata as JsonObject)?.body as string,
@@ -96,10 +97,11 @@ async function sendMail(currentAction: any, workflowMetdata: any) {
     (currentAction.metadata as JsonObject)?.email as string,
     workflowMetdata
   );
+  console.log(await sendEmail(email, body));
   console.log({ email, body });
 }
 
-async function sendSol(currentAction: any, workflowMetdata: any) {
+async function solana(currentAction: any, workflowMetdata: any) {
   console.log('sendSol()');
   const amount = parse(
     (currentAction.metadata as JsonObject)?.amount as string,

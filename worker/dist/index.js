@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const kafkajs_1 = require("kafkajs");
 const parser_1 = require("./parser");
+const email_1 = require("./services/email");
 const TOPIC = 'workflow-events';
 const kafka = new kafkajs_1.Kafka({
     clientId: 'outbox-processor',
@@ -66,10 +67,10 @@ function worker() {
                 }
                 const workflowMetdata = workflowRunDetails.metadata;
                 if (currentAction.type.id === 'email') {
-                    yield sendMail(currentAction, workflowMetdata);
+                    yield email(currentAction, workflowMetdata);
                 }
                 else if (currentAction.type.id === 'send-sol') {
-                    yield sendSol(currentAction, workflowMetdata);
+                    yield solana(currentAction, workflowMetdata);
                 }
                 const lastStage = actions.length - 1;
                 if (stage !== lastStage) {
@@ -86,16 +87,17 @@ function worker() {
         });
     });
 }
-function sendMail(currentAction, workflowMetdata) {
+function email(currentAction, workflowMetdata) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         console.log('SendEmail()');
         const body = (0, parser_1.parse)((_a = currentAction.metadata) === null || _a === void 0 ? void 0 : _a.body, workflowMetdata);
         const email = (0, parser_1.parse)((_b = currentAction.metadata) === null || _b === void 0 ? void 0 : _b.email, workflowMetdata);
+        console.log(yield (0, email_1.sendEmail)(email, body));
         console.log({ email, body });
     });
 }
-function sendSol(currentAction, workflowMetdata) {
+function solana(currentAction, workflowMetdata) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         console.log('sendSol()');
